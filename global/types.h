@@ -18,4 +18,10 @@ typedef struct Response
     pid_t server_child_pid;
 } Response;
 
+typedef struct Ack
+{
+    int confirmation;
+    pid_t client_pid;
+} Ack;
+
 #endif
