@@ -1,9 +1,9 @@
 #include "../../global/libs.h"
+#include "../../global/constants.h"
+#include "../../global/types.h"
 
 int main(int argc, char **argv)
-{
-  int x;
-
+{ 
   if (argc != 2)
   {
     printf("Usage: %s <port>\n", argv[0]);
@@ -18,6 +18,14 @@ int main(int argc, char **argv)
   char buffer[1024];
   socklen_t addr_size;
 
+  Request req;
+  Response res;
+  Ack ack;
+  int data;
+
+  /* Init the random number generator */
+  srand(getpid());
+
   sockfd = socket(AF_INET, SOCK_DGRAM, 0);
   memset(&addr, '\0', sizeof(addr));
   addr.sin_family = AF_INET;
@@ -29,22 +37,29 @@ int main(int argc, char **argv)
   ackaddr.sin_port = htons(3000);
   ackaddr.sin_addr.s_addr = inet_addr(ip);
 
-  bzero(buffer, 1024);
-  strcpy(buffer, "Hello, World!");
-  sendto(sockfd, buffer, 1024, 0, (struct sockaddr *)&addr, sizeof(addr));
-  printf("[+]Data send: %s\n", buffer);
+  data = (rand() % (UPPER - LOWER + 1)) + LOWER;
+  printf("Client random generated number: %d \n", data);
 
-  bzero(buffer, 1024);
+  req.data = data;
+  req.client_pid = getpid();
+
+  sendto(sockfd, &req, sizeof(req), 0, (struct sockaddr *)&addr, sizeof(addr));
+  printf("[+]Data sent: %d\n", data);
+
   addr_size = sizeof(addr);
-  recvfrom(sockfd, buffer, 1024, 0, (struct sockaddr *)&addr, &addr_size);
-  printf("[+]Data recv: %s\n", buffer);
+  recvfrom(sockfd, &res, sizeof(Response), 0, (struct sockaddr *)&addr, &addr_size);
+  printf("Server responded with:\t");
+  for (int i = 0; i < res.size; i++)
+  {
+    printf("%d ", res.data[i]);
+  }
+  printf("\n");
 
-  //  printf("the new socket created by the server :%d\n", ntohs(tmpaddr.sin_port));
-  printf("the old socket created by the server :%d\n", ntohs(addr.sin_port));
+  ack.client_pid = getpid();
+  ack.confirmation = 1;
 
-  printf("da5el value\n");
-  scanf("%d", &x);
-  sendto(sockfd, "yoooo hhh", 1024, 0, (struct sockaddr *)&ackaddr, sizeof(ackaddr));
+  sendto(sockfd, &ack, sizeof(ack), 0, (struct sockaddr *)&ackaddr, sizeof(ackaddr));
 
+  close(sockfd);
   return 0;
 }
