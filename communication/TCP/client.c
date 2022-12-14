@@ -2,7 +2,6 @@
 #include "../../global/constants.h"
 #include "../../global/types.h"
 
-
 int main(int argc, char **argv)
 {
 	/* Checking if the user entred a port */
@@ -12,6 +11,7 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
+	/* Declare the needed variables */
 	int clientSocket, ret;
 	struct sockaddr_in serverAddr;
 
@@ -25,6 +25,7 @@ int main(int argc, char **argv)
 	/* Init the random number generator */
 	srand(getpid());
 
+	/* Creating the client socket */
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket < 0)
 	{
@@ -48,13 +49,18 @@ int main(int argc, char **argv)
 	}
 	printf("[+]Connected to Server.\n");
 
+	/* Generating a random number */
 	data = (rand() % (UPPER - LOWER + 1)) + LOWER;
 	printf("[+]Client random generated number: %d \n", data);
 
+	/* Preparing the request */
 	req.data = data;
 	req.client_pid = getpid();
 
+	/* Send a request to the server */
 	send(clientSocket, &req, sizeof(req), 0);
+
+	/* Receiving response from the server */
 	if (recv(clientSocket, &res, sizeof(Response), 0) < 0)
 	{
 		printf("[-]Error in receiving data.\n");
@@ -69,8 +75,11 @@ int main(int argc, char **argv)
 		printf("\n");
 	}
 
+	/* Preparing the ack */
 	ack.client_pid = getpid();
 	ack.confirmation = 1;
+
+	/* Sending ack to the server */
 	printf("[+]Sending ack to the server\n");
 	send(clientSocket, &ack, sizeof(ack), 0);
 

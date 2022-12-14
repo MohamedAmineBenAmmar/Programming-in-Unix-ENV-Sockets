@@ -1,4 +1,10 @@
 {
-"server":{"PID":94187, "port":4444, "address": "127.0.0.1"},
-"client_1": {"address":"0.0.0.0", "port": "0"}
+"server":{"PID":101438, "port":4444, "address": "127.0.0.1"},
+"client_1": {"address":"127.0.0.1", "port": "50216"},
+"client_2": {"address":"127.0.0.1", "port": "36523"},
+"client_3": {"address":"127.0.0.1", "port": "47036"},
+"client_4": {"address":"127.0.0.1", "port": "51533"},
+"client_5": {"address":"127.0.0.1", "port": "57164"},
+"client_6": {"address":"127.0.0.1", "port": "57759"},
+"client_7": {"address":"127.0.0.1", "port": "54197"}
 }

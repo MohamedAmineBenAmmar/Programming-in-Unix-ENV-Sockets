@@ -152,48 +152,48 @@ int main(int argc, char **argv)
 				recv(newSocket, &req, sizeof(Request), 0);
 				printf("[+]Client with PID %d send %d as payload.\n", req.client_pid, req.data);
 
+				/* Opening the specific client file that will hold his communication with the server */
 				cfptr = fopen(client_filepath, "a");
 				fprintf(cfptr, "%s", "{");
-				fprintf(fptr, "%s", "\"input\":");
-				fprintf(fptr, "%d", req.data);
-				fprintf(fptr, "%s", ", \"output\": [");
+				fprintf(cfptr, "%s", "\"input\":");
+				fprintf(cfptr, "%d", req.data);
+				fprintf(cfptr, "%s", ", \"output\": [");
 
 				res.size = req.data;
 				for (int i = 0; i < res.size; i++)
 				{
 					int gen_rand_nbr = (rand() % (UPPER - LOWER + 1)) + LOWER;
-					fprintf(fptr, "%d", gen_rand_nbr);
+					fprintf(cfptr, "%d", gen_rand_nbr);
 					if (i + 1 < res.size)
 					{
-						fprintf(fptr, "%c", ',');
+						fprintf(cfptr, "%c", ',');
 					}
 					res.data[i] = gen_rand_nbr;
 				}
-				fprintf(fptr, "%s", "], ");
-				fprintf(fptr, "%s", "\"server_child_pid\":");
-				fprintf(fptr, "%d", getpid());
-				fprintf(fptr, "%s", ", ");
-				fprintf(fptr, "%s", "\"server_pid\":");
-				fprintf(fptr, "%d", getppid());
-				fprintf(fptr, "%s", ", ");
-				fprintf(fptr, "%s", "\"pid\":");
-				fprintf(fptr, "%d", req.client_pid);
+				fprintf(cfptr, "%s", "], ");
+				fprintf(cfptr, "%s", "\"server_child_pid\":");
+				fprintf(cfptr, "%d", getpid());
+				fprintf(cfptr, "%s", ", ");
+				fprintf(cfptr, "%s", "\"server_pid\":");
+				fprintf(cfptr, "%d", getppid());
+				fprintf(cfptr, "%s", ", ");
+				fprintf(cfptr, "%s", "\"pid\":");
+				fprintf(cfptr, "%d", req.client_pid);
+				fprintf(fptr, "%s", "}");
 				fclose(cfptr);
 
 				res.server_pid = getppid();
 				res.server_child_pid = getpid();
 
 				send(newSocket, &res, sizeof(res), 0);
+				printf("[+]Data sent to the client %s:%d\n", new_client_ip_address, new_client_port);
 
+
+				/* Waiting the ack from the client */
 				recv(newSocket, &ack, sizeof(Ack), 0);
 				if (ack.confirmation == 1)
 				{
 					printf("[+]The client with %s:%d and a PID of %d has received the server response and confirmed that.\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port), ack.client_pid);
-					// cfptr = fopen(client_filepath, "a");
-					// fprintf(fptr, "%s", ", ");
-					// fprintf(fptr, "%s", "\"ack\": true");
-					// fprintf(fptr, "%s", "}");
-					// fclose(cfptr);
 					break;
 				}
 			}
