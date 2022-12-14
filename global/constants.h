@@ -7,5 +7,7 @@
 #define FIFO2 "named-pipes/fifo2"
 #define LOWER 1
 #define UPPER NMAX
+#define COMMUNICATION "data/communication.json"
+#define DATA "data/"
 
 #endif

@@ -2,18 +2,25 @@
 #include "../../global/constants.h"
 #include "../../global/types.h"
 
-#define PORT 4444
 
-int main()
+int main(int argc, char **argv)
 {
+	/* Checking if the user entred a port */
+	if (argc != 2)
+	{
+		printf("Usage: %s <port>\n", argv[0]);
+		exit(0);
+	}
+
 	int clientSocket, ret;
 	struct sockaddr_in serverAddr;
-	char buffer[1024];
 
 	Request req;
 	Response res;
 	Ack ack;
 	int data;
+
+	int port = atoi(argv[1]);
 
 	/* Init the random number generator */
 	srand(getpid());
@@ -21,16 +28,18 @@ int main()
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket < 0)
 	{
-		printf("[-]Error in connection.\n");
+		printf("[-]Error in the client socket creation.\n");
 		exit(1);
 	}
 	printf("[+]Client Socket is created.\n");
 
+	/* Configuring server socket data */
 	memset(&serverAddr, '\0', sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(PORT);
+	serverAddr.sin_port = htons(port);
 	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
+	/* Establishing the connection with the server */
 	ret = connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
 	if (ret < 0)
 	{
@@ -40,7 +49,7 @@ int main()
 	printf("[+]Connected to Server.\n");
 
 	data = (rand() % (UPPER - LOWER + 1)) + LOWER;
-	printf("Client random generated number: %d \n", data);
+	printf("[+]Client random generated number: %d \n", data);
 
 	req.data = data;
 	req.client_pid = getpid();
@@ -52,7 +61,7 @@ int main()
 	}
 	else
 	{
-		printf("Server responded with:\t");
+		printf("[+]Server responded with:\t");
 		for (int i = 0; i < res.size; i++)
 		{
 			printf("%d ", res.data[i]);
@@ -62,6 +71,7 @@ int main()
 
 	ack.client_pid = getpid();
 	ack.confirmation = 1;
+	printf("[+]Sending ack to the server\n");
 	send(clientSocket, &ack, sizeof(ack), 0);
 
 	close(clientSocket);
