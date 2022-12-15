@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "unistd.h": "c",
-        "libs.h": "c"
+        "libs.h": "c",
+        "handlers_cli.h": "c"
     }
 }
